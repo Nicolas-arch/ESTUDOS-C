@@ -1,0 +1,253 @@
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+
+#define TAMANHO_MAXIMO_DE_PILHA 100
+#define TAMANHO_MAXIMO_DE_FILA  100
+
+typedef struct {
+    char pedaco [21]; /* pensando em números de até 20 caracteres */
+} Elemento;
+
+typedef struct {
+    Elemento vetor_de_elementos [TAMANHO_MAXIMO_DE_PILHA];
+    int posicao_do_ultimo_elemento;
+} Pilha;
+
+typedef struct {
+    Elemento vetor_de_Elementos [TAMANHO_MAXIMO_DE_FILA];
+    int posicao_do_ultimo_Elemento;
+} Fila;
+
+void inicialize_a_pilha (Pilha* p){
+    (*p).posicao_do_ultimo_elemento=-1;
+}
+
+unsigned char pilha_vazia (Pilha p){
+    if (p.posicao_do_ultimo_elemento==-1)
+        return 1;
+    else
+        return 0;
+}
+
+unsigned char pilha_cheia (Pilha p){
+    if (p.posicao_do_ultimo_elemento==TAMANHO_MAXIMO_DE_PILHA-1)
+        return 1;
+    else
+        return 0;
+}
+
+void guarde_item_na_pilha (Pilha* p, Elemento e){
+    (*p).posicao_do_ultimo_elemento++;
+    (*p).vetor_de_elementos[(*p).posicao_do_ultimo_elemento] = e;
+}
+
+Elemento recupere_um_item_da_pilha (Pilha p){
+    return p.vetor_de_elementos[p.posicao_do_ultimo_elemento];
+}
+
+void remova_um_item_da_pilha (Pilha* p){
+    (*p).posicao_do_ultimo_elemento--;
+}
+
+void inicialize_a_fila (Fila* f){
+    (*f).posicao_do_ultimo_Elemento=-1;
+}
+
+unsigned char fila_vazia (Fila f){
+    if (f.posicao_do_ultimo_Elemento==-1)
+        return 1;
+    else
+        return 0;
+}
+
+unsigned char fila_cheia (Fila f){
+    if (f.posicao_do_ultimo_Elemento==TAMANHO_MAXIMO_DE_FILA-1)
+        return 1;
+    else
+        return 0;
+}
+
+void guarde_item_na_fila (Fila* f, Elemento e){
+    (*f).posicao_do_ultimo_Elemento++;
+    (*f).vetor_de_Elementos[(*f).posicao_do_ultimo_Elemento] = e;
+}
+
+Elemento recupere_um_item_da_fila (Fila f){
+    return f.vetor_de_Elementos[0];
+}
+
+void remova_um_item_da_fila (Fila* f){
+    int i;
+
+    for (i=1; i<=(*f).posicao_do_ultimo_Elemento; i++)
+        (*f).vetor_de_Elementos [i-1]=(*f).vetor_de_Elementos [i];
+
+    (*f).posicao_do_ultimo_Elemento--;
+}
+
+unsigned char posso_desempilhar(char doTopoDaPilha, char daSequencia){
+    unsigned char i = 0;
+    char operadores[7] = "(^*/+-)";
+    int linha,coluna;
+    unsigned char tabela[7][7] = {{0,0,0,0,0,0,1},
+                                   {0,0,1,1,1,1,1},
+                                   {0,0,1,1,1,1,1},
+                                   {0,0,1,1,1,1,1},
+                                   {0,0,0,0,1,1,1},
+                                   {0,0,0,0,1,1,1},
+                                   {0,0,0,0,0,0,0}};
+    for(i=0;i<7;i++){
+        if(operadores[i] == doTopoDaPilha){
+            linha = i;
+        }
+    }
+    for(i=0;i<7;i++){
+        if(operadores[i] == daSequencia){
+            coluna = i;
+        }
+    }
+    return tabela[linha][coluna];
+}
+
+unsigned char so_tem_chars_validos(char expressao []){
+    int i,j,operadores_iguais_valor_expressao = 0;
+    int tamanho_expressao = strlen(expressao)-1;
+    char operadores[18] = "(^*/+-)0123456789.";
+    for(i=0;i<tamanho_expressao;i++){
+        for(j=0;j<18;j++){
+            if(expressao[i] == operadores[j]){
+                operadores_iguais_valor_expressao += 1;
+            }
+        }
+    }
+    if(tamanho_expressao == operadores_iguais_valor_expressao){
+        return 1;
+    }
+    return 0;
+}
+
+unsigned char parenteses_balanceados(char expressao []){
+    unsigned int i, tamanho=strlen(expressao), qtd_parenteses_abertos=0;
+
+    for (i=0; i<tamanho; i++)
+        if (expressao[i]=='(')
+            qtd_parenteses_abertos++;
+        else if (expressao[i]==')')
+            if (qtd_parenteses_abertos==0)
+                return 0;
+            else
+               qtd_parenteses_abertos--;
+
+    if (qtd_parenteses_abertos!=0)
+        return 0;
+    else
+        return 1;
+}
+
+// void elimine_espacos(char expressao []){
+//     char* string_comecando_no_1o_espaco = strchr(expressao,' ');
+
+//     while (posicao!=-1)
+//     {
+//         memmove(string_comecando_no_1o_espaco,string_comecando_no_1o_espaco+1,strlen(string_comecando_no_1o_espaco+1));
+//         string_comecando_no_1o_espaco=strchr(expressao,' ');
+//     }
+// }
+
+void obtem_pedaco(char expressao[], char pedaco[], int* pos){
+    int i=0; // 1,2
+
+    if (expressao[*pos]>='0' && expressao[*pos]<='9')
+    {
+        while (expressao[*pos]>='0' && expressao[*pos]<='9')
+        {
+            pedaco[i]=expressao[*pos];
+            i++;
+            (*pos)++;
+        }
+        pedaco[i]='\0';
+    }
+    else
+    {
+            pedaco[i]=expressao[*pos];
+            i++;
+            (*pos)++;
+            pedaco[i]='\0';
+    }
+}
+
+int main(){
+    Fila fila;
+    Pilha pilha;
+    int i;
+    char expressao[201];
+    char pedaco[21];
+    int  pos=0;
+    int pedaco_e_digito = 0;
+    Elemento pedaco_elemento;
+    unsigned char validacao = 0;
+    int desempilhamento = 1;
+    char parenteses[2] = "()";
+
+    inicialize_a_fila(&fila);
+    inicialize_a_pilha(&pilha);
+
+
+
+    while(validacao == 0){
+        printf("Digite a expressão: \n");
+        fgets(expressao,200,stdin);
+        if(!so_tem_chars_validos(expressao) || !parenteses_balanceados(expressao)){
+            printf ("Expressao com caracteres invalidos! Tente novamente!");
+        }else{
+            validacao = 1;
+        }
+    }
+
+    // elimine_espacos(expressao, pos) -- validacao desnecessária
+
+    while(pos < strlen(expressao)-1){
+        desempilhamento = 1;
+        obtem_pedaco(expressao,pedaco,&pos);
+        strcpy(pedaco_elemento.pedaco,pedaco);
+        pedaco_e_digito = isdigit(pedaco_elemento.pedaco[0]);
+        if(pedaco_e_digito){
+            guarde_item_na_fila(&fila,pedaco_elemento);
+        }else if(pilha_vazia(pilha)){
+            guarde_item_na_pilha(&pilha,pedaco_elemento);
+        }else{
+            while(desempilhamento == 1){
+                if(!pilha_vazia(pilha) && posso_desempilhar(recupere_um_item_da_pilha(pilha).pedaco[0],pedaco_elemento.pedaco[0])){
+                    if(parenteses[0] == recupere_um_item_da_pilha(pilha).pedaco[0] && parenteses[1] == pedaco_elemento.pedaco[0]){
+                        remova_um_item_da_pilha(&pilha);
+                        desempilhamento = 0;
+                    }else{
+                    guarde_item_na_fila(&fila,recupere_um_item_da_pilha(pilha));
+                    remova_um_item_da_pilha(&pilha);
+                    }
+                }else{
+                    guarde_item_na_pilha(&pilha, pedaco_elemento);
+                    desempilhamento = 0;
+                }
+            }
+        }
+    }
+
+    if(!pilha_vazia(pilha)){
+        while(pilha.posicao_do_ultimo_elemento >= 0){
+            guarde_item_na_fila(&fila,recupere_um_item_da_pilha(pilha));
+            remova_um_item_da_pilha(&pilha);
+        }
+    }
+
+    for(i=0;i<fila.posicao_do_ultimo_Elemento+1;i++){
+        printf("%s",fila.vetor_de_Elementos[i].pedaco);
+        fflush(stdout);
+    }
+
+    return 0;
+}
+
+
+
